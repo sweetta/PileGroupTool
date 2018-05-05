@@ -622,52 +622,6 @@ void SystemPlotQwt::refresh()
         plotItemList.append(var2);
     }
 
-    /* Old Version
-    //double forceArrowRatioV = PV/MAX_V_FORCE,
-    //       arrowHeadLengthV = 0.3,
-    //       arrowHeadV       = 1.5,
-    //      arrowThicknessV  = 0.3;
-
-    double forceArrowRatioV = -PV/MAX_V_FORCE,
-           arrowHeadLengthV = -10 * yScalar,
-           arrowHeadV       =  10 * xScalar,
-           arrowThicknessV  =   3 * xScalar;
-
-
-    if (( forceArrowRatioV < 0.3 ) && (forceArrowRatioV > 0)) {
-        forceArrowRatio = 0.3;
-    }
-    else if (( forceArrowRatioV > -0.3 ) && (forceArrowRatioV < 0)) {
-        forceArrowRatioV = -0.3;
-    }
-
-    arrowV->setPen( pen );
-    arrowV->setBrush( Qt::red );
-
-    if (forceArrowRatioV < 0) {arrowHeadLengthV = -arrowHeadLengthV;}
-
-    QPainterPath pathV;
-    pathV.moveTo( pileCapCenter                  , L1 + maxH                       );
-    pathV.lineTo( pileCapCenter - arrowHeadV     , L1 + maxH + arrowHeadLengthV    );
-    pathV.lineTo( pileCapCenter - arrowThicknessV, L1 + maxH + arrowHeadLengthV    );
-    pathV.lineTo( pileCapCenter - arrowThicknessV, L1 + maxH + arrowHeadLengthV + forceArrowRatioV    );
-    pathV.lineTo( pileCapCenter + arrowThicknessV, L1 + maxH + arrowHeadLengthV + forceArrowRatioV    );
-    pathV.lineTo( pileCapCenter + arrowThicknessV, L1 + maxH + arrowHeadLengthV    );
-    pathV.lineTo( pileCapCenter + arrowHeadV     , L1 + maxH + arrowHeadLengthV    );
-    pathV.lineTo( pileCapCenter                  , L1 + maxH                       );
-    arrowV->setShape( pathV );
-    //arrowV->setZ	( 3 );
-
-    if (forceArrowRatioV != 0){
-        arrowV->attach( plot );
-
-        PLOTOBJECT var2;
-        var2.itemPtr = arrowV;
-        var2.type    = PLType::LOAD;
-        var2.index   = 1;
-        plotItemList.append(var2);
-    }
-
     // status info
     if (!mIsStable)
     {
