@@ -28,6 +28,7 @@ SystemPlotQwt::SystemPlotQwt(QWidget *parent) :
     // Create a QwtPlot
     //
     plot = new QwtPlot(this);
+    plot->setCanvasBackground(QBrush(Qt::white));
     plotItemList.clear();
 
     // Create Background Grid for Plot
@@ -43,7 +44,7 @@ SystemPlotQwt::SystemPlotQwt(QWidget *parent) :
     this->setLayout(lyt);
 
     //Picker
-    QwtPicker *picker = new QwtPicker(plot -> canvas());
+    QwtPicker *picker = new QwtPicker(plot->canvas());
     picker->setStateMachine(new QwtPickerClickPointMachine);
     picker->setTrackerMode(QwtPicker::AlwaysOff);
     picker->setRubberBand(QwtPicker::RectRubberBand);
@@ -269,11 +270,6 @@ void SystemPlotQwt::refresh()
     double xl = xbar - W/2;
     double xr = xbar + W/2;
 
-
-    //
-    // HERE IS WHERE TO START ...
-    //
-
     // Plot Legend
     plot->insertLegend( new QwtLegend(), QwtPlot::BottomLegend );
 
@@ -285,34 +281,6 @@ void SystemPlotQwt::refresh()
     //
     // Plot Ground Water Table
     //
-
-    //plot->setCurrentLayer("groundwater");
-    /*
-    if (gwtDepth < (H-L1)) {
-        QPolygonF(groundwaterCorners);
-        groundwaterCorners << QPointF(xl, -gwtDepth)
-                           << QPointF(xl, -(H - L1))
-                           << QPointF(xr, -(H - L1))
-                           << QPointF(xr, -gwtDepth)
-                           << QPointF(xl, -gwtDepth);
-
-        QwtPlotShapeItem *water = new QwtPlotShapeItem();
-        water->setPolygon(groundwaterCorners);
-
-        water->setPen(QPen(Qt::blue, 2));
-        water->setBrush(QBrush(GROUND_WATER_BLUE));
-
-        water->setTitle(QString("Groundwater"));
-        water->attach( plot );
-        water->setItemAttribute(QwtPlotItem::Legend, true);
-
-        PLOTOBJECT var;
-        var.itemPtr = water;
-        var.type    = PLType::WATER;
-        var.index   = -1;
-        plotItemList.append(var);
-    }
-    */
 
     if (gwtDepth < (H-L1)) {
         QPolygonF(groundwaterCorners);
@@ -401,7 +369,7 @@ void SystemPlotQwt::refresh()
     }
 
     //
-    // Plot PileCaps
+    // Plot the Pile Cap
     //
     QRectF capCorners(QPointF(minX0 - maxD/2, L1 + maxH), QSizeF(maxX0 + maxD - minX0, -maxH));
 
@@ -419,10 +387,10 @@ void SystemPlotQwt::refresh()
 
     pileCap->setItemAttribute(QwtPlotItem::Legend, false);
 
-
     //
     // Plot Piles
     //
+
     for (int pileIdx=0; pileIdx<numPiles; pileIdx++) {
 
         double D = pileDiameter[pileIdx];
@@ -475,139 +443,69 @@ void SystemPlotQwt::refresh()
         plotItemList.append(var);
     }
 
-
-
-#if 0
-    // plot the pile cap
-
-    plot->setCurrentLayer("piles");
-
-    QVector<double> x(5,0.0);
-    QVector<double> y(5,0.0);
-QwtLegend
-    x[0] = minX0 - maxD/2.; y[0] = L1 + maxH;
-    x[1] = x[0];            y[1] = L1 - maxH;
-    x[2] = maxX0 + maxD/2.; y[2] = y[1];
-    x[3] = x[2];            y[3] = y[0];
-    x[4] = x[0];            y[4] = y[0];
-
-    QCPCurve *pileCap = new QCPCurve(plot->xAxis, plot->yAxis);
-    pileCap->setData(x,y);
-    pileCap->setPen(QPen(Qt::black, 1));
-    pileCap->setBrush(QBrush(Qt::gray));
-    pileCap->removeFromLegend();
-
-    // plot the piles
-    for (int pileIdx=0; pileIdx<numPiles; pileIdx++) {
-
-        QVector<double> x(5,0.0);
-        QVector<double> y(5,0.0);
-
-        double D = pileDiameter[pileIdx];
-
-        x[0] = xOffset[pileIdx] - D/2.; y[0] = L1;
-        x[1] = x[0];                    y[1] = -L2[pileIdx];
-        x[2] = xOffset[pileIdx] + D/2.; y[2] = y[1];
-        x[3] = x[2];                    y[3] = y[0];
-        x[4] = x[0];                    y[4] = y[0];
-
-        QCPCurve *pileII = new QCPCurve(plot->xAxis, plot->yAxis);
-        pileII->setData(x,y);
-        if (pileIdx == activePileIdx) {
-            pileII->setPen(QPen(Qt::red, 2));
-            pileII->setBrush(QBrush(BRUSH_COLOR[9+pileIdx]));
-        }
-        else {
-            pileII->setPen(QPen(Qt::black, 1));
-            pileII->setBrush(QBrush(BRUSH_COLOR[6+pileIdx]));
-        }
-        pileII->setName(QString("Pile #%1").arg(pileIdx+1));
-    }
-#endif
-
-    // Plot Scaling Parameters
-
-    QPointF plotZero     = QPointF(0, 0);
-    QPointF deltaPoint   = QPointF(5, 5);
-
     double pileCapCenter = 0.5 * (minX0 + maxX0);
     QPointF forceOrigin  = QPointF(pileCapCenter, L1 + maxH);
+
+    //
+    // Plot Scaling Parameters
+    //
+
+    QPointF plotZero     = QPointF(0.0, 0.0);
+    QPointF deltaPoint   = QPointF(5.0, 5.0);
 
     double deltaPointx   = plot->canvasMap( QwtPlot::xBottom).transform(deltaPoint.x());
     double zeroPointx    = plot->canvasMap( QwtPlot::xBottom).transform(plotZero.x());
     double deltaPointy   = plot->canvasMap( QwtPlot::yLeft).transform(deltaPoint.y());
     double zeroPointy    = plot->canvasMap( QwtPlot::yLeft).transform(plotZero.y());
 
-    double xScalar = 5/(deltaPointx-zeroPointx);
-    double yScalar = 5/(deltaPointy-zeroPointy);
+    double xScalar = 5.0/(deltaPointx-zeroPointx);
+    double yScalar = 5.0/(deltaPointy-zeroPointy);
 
-    qWarning() << "zeroPointx = "   + QString::number(zeroPointx);
-    qWarning() << "zeroPointy = "   + QString::number(zeroPointy);
-    qWarning() << "deltaPointx = "  + QString::number(deltaPointx);
-    qWarning() << "deltaPointy = "  + QString::number(deltaPointy);
-    qWarning() << "xScalar = "      + QString::number(xScalar);
-    qWarning() << "yScalar = "      + QString::number(yScalar);
-
-    // Test
-    /*
-    QPolygonF testCorners;
-    double testLength(100); // in screen coordinates dimensions
-    testCorners   << forceOrigin
-                  << QPointF( forceOrigin.x() + testLength*xScalar, forceOrigin.y())
-                  << QPointF( forceOrigin.x() + testLength*xScalar,forceOrigin.y() + testLength*yScalar)
-                  << QPointF( forceOrigin.x(),  forceOrigin.y() + testLength*yScalar)
-                  << forceOrigin;
-
-    QwtPlotShapeItem *testObject = new QwtPlotShapeItem();
-    testObject->setPolygon(testCorners);
-    testObject->setPen(QPen(Qt::black, 1));
-    testObject->setBrush(QBrush(Qt::blue));
-    testObject->setZ(10);
-    testObject->attach( plot );
-
-    PLOTOBJECT testsq;
-    testsq.itemPtr = testObject;
-    testsq.type    = PLType::OTHER;
-    testsq.index   = -1;
-    plotItemList.append(testsq);
-    // Test End
-    */
+    //qDebug()   << "zeroPoint  (x,y) = (" << zeroPointx << "," << zeroPointy << ")\n"
+    //           << "deltaPoint (x,y) = (" << deltaPointx << "," << deltaPointy << ")\n"
+    //           << "Scalar     (x,y) = (" << xScalar << "," << yScalar << ")\n";
 
     //
-    // Plotting the Applied Moment
+    // Plotting the Applied Moment Symbol
     //
+    double alpha;
+    double dTheta;
+    double theta;
+
+    double mR = 25.0; // Moment Radius in screen coordinates
+    double nChords = 20;
+
+    double Rx = mR*xScalar;
+    double Ry = mR*yScalar;
+
     QwtPlotCurve *moment = new QwtPlotCurve();
     QPolygonF pointsOnMomentCurve;
 
-    double mR = 25; // Moment Radius in screen coordinates
-    double nChords = 10;// Set the resolution of the moment curve
-    double alpha = (1 - 0.75*abs(PMom)/MAX_MOMENT) * (2*3.14159);
-    double theta = (2*3.14159 - alpha) / (nChords-1);
-    double momentHeadLength = 15 * (3.14159/180);
-    double momentHeadWidth = 4;
-
-    if (PMom < 0){
-        theta = -theta;
-        momentHeadLength = -momentHeadLength;
+    if (PMom < 0)
+    {
+        alpha = (1.0 + 0.75*(PMom)/MAX_MOMENT) * (2*3.1415927);
+        dTheta = (alpha - 2*3.1415927) / (nChords-1);
+        theta = 0.5*(3.1415927 - alpha);
+    }
+    else
+    {
+        alpha = (1.0 - 0.75*(PMom)/MAX_MOMENT) * (2*3.1415927);
+        dTheta = (2*3.1415927 - alpha) / (nChords-1);
+        theta = 0.5*(alpha + 3.1415927);
     }
 
-    for (int n=0; n<(nChords+1); n++) {
-        pointsOnMomentCurve << (forceOrigin + QPointF(mR*sin(n*theta)*xScalar, mR*cos(n*theta)*yScalar));
+    for (int n=0; n<=nChords; n++)
+    {
+        pointsOnMomentCurve << (forceOrigin + QPointF(Rx*cos(theta), Ry*sin(theta)));
+        theta += dTheta;
     }
-    // Arrowhead
-    pointsOnMomentCurve << (forceOrigin + QPointF((mR-momentHeadWidth)*sin(nChords*theta-momentHeadLength)*xScalar,
-                                                  (mR-momentHeadWidth)*cos(nChords*theta-momentHeadLength)*yScalar))
-                        << (forceOrigin + QPointF((mR+momentHeadWidth)*sin(nChords*theta-momentHeadLength)*xScalar,
-                                                  (mR+momentHeadWidth)*cos(nChords*theta-momentHeadLength)*yScalar))
-                        << (forceOrigin + QPointF(mR*sin(nChords*theta)*xScalar, mR*cos(nChords*theta)*yScalar));
+    theta -= dTheta;
+    pointsOnMomentCurve << (forceOrigin + QPointF(0.8*Rx*cos(theta-3*dTheta), 0.8*Ry*sin(theta-3*dTheta)));
+    pointsOnMomentCurve << (forceOrigin + QPointF(1.2*Rx*cos(theta-3*dTheta), 1.2*Ry*sin(theta-3*dTheta)));
+    pointsOnMomentCurve << (forceOrigin + QPointF(Rx*cos(theta), Ry*sin(theta)));
 
-    QPen mArrow( Qt::red, 4 );
-    mArrow.setJoinStyle( Qt::MiterJoin );
-    moment->setPen( mArrow );
     moment->setSamples(pointsOnMomentCurve);
-    //moment->setPen(QPen(Qt::red, 4));
-    //moment->setBrush(QBrush(Qt::blue));
-    //moment->setZ(10);
+    moment->setPen(QPen(Qt::red, 3));
 
     if (PMom != 0){
         moment->attach( plot );
@@ -618,7 +516,6 @@ QwtLegend
         var.index   = 2;
         plotItemList.append(var);
     }
-
 
     //
     // Drawing Horizontal Force Arrow using QwtPlotShapeItem
@@ -670,11 +567,6 @@ QwtLegend
 
 
     // Drawing Vertical Force Arrow using QwtPlotShapeItem
-
-    //double heightAbovePileCap = 1;
-    //plot->setAxisScale( QwtPlot::xBottom, xbar - W/2, xbar + W/2 );
-    //plot->setAxisScale( QwtPlot::yLeft, -depthOfLayer[3], L1 + maxH + heightAbovePileCap );
-
     QwtPlotShapeItem *arrowV = new QwtPlotShapeItem();
 
     double forceArrowRatioV =  PV/MAX_V_FORCE;
@@ -749,9 +641,6 @@ QwtLegend
         forceArrowRatioV = -0.3;
     }
 
-
-    //QPen pen( Qt::black, 2 );
-    //pen.setJoinStyle( Qt::MiterJoin );
     arrowV->setPen( pen );
     arrowV->setBrush( Qt::red );
 
@@ -778,8 +667,6 @@ QwtLegend
         var2.index   = 1;
         plotItemList.append(var2);
     }
-    */
-
 
     // status info
     if (!mIsStable)
