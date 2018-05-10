@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     }
 
     MainWindow w(graphicModeQCP);
-    w.setWindowIcon(QIcon(":/resources/NHERI-PGT-Icon.icns"));
+    QApplication::setWindowIcon(QIcon(":/resources/NHERI-PGT-Icon.icns"));
     w.show();
 
     QFile file(":/style.qss");

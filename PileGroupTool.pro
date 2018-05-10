@@ -64,6 +64,7 @@ win32: QMAKE_CXXFLAGS += /Y-
 
 include(OPS_includes.pro)
 
+mac: ICON = resources/NHERI-PGT-Icon.icns
 
 #INCLUDEPATH += "$(HOME)/OpenSees/DEVELOPER/core"
 INCLUDEPATH += ./qwt-6.2/src
