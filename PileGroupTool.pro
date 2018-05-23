@@ -48,9 +48,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network
 
 TARGET   = PileGroupTool
 TEMPLATE = app
-VERSION  = 1.99.2
+VERSION  = 2.0.2
 
-#VERSION = pre2.0.2
 #M_REV     = $Rev: $
 
 PRODUCT_NAME = 'PileGroupTool'
@@ -70,7 +69,6 @@ mac: ICON = resources/NHERI-PGT-Icon.icns
 INCLUDEPATH += ./qwt-6.2/src
 LIBS += -L"$(HOME)/Development/SimCenter/PileGroupTool/qwt-6.2/lib"
 LIBS += -L"$(HOME)/Documents/GitHub/PileGroupTool/qwt-6.2/lib"
-LIBS += -lqwt
 
 INCLUDEPATH += includes
 INCLUDEPATH += mainWindow
@@ -78,33 +76,32 @@ INCLUDEPATH += dialogs
 INCLUDEPATH += plots
 INCLUDEPATH += FEA
 
-
 unix: {
     INCLUDEPATH += ./qwt-6.2/src
 
-    LIBS += -L"$(HOME)/Development/SimCenter/PileGroupTool/qwt-6.2/lib"
-    LIBS += -lqwt
+    #LIBS += -L"$(HOME)/Development/SimCenter/PileGroupTool/qwt-6.2/lib"
+    #LIBS += -lqwt
+    LIBS += $(HOME)/Development/SimCenter/PileGroupTool/qwt-6.2/lib/libqwt.a
+    LIBS += $(HOME)/Development/SimCenter/PileGroupTool/qwt-6.2/lib/libqwtmathml.a
+
+    QT += svg
 }
 
-SOURCES += main.cpp\
+SOURCES += main.cpp \
         mainWindow/mainwindow.cpp \
-        qcp/qcustomplot.cpp \
         FEA/getPyParam.cpp \
         FEA/getQzParam.cpp \
         FEA/getTZParam.cpp \
         FEA/soilmat.cpp \
         FEA/pilefeamodeler.cpp \
         dialogs/materialdbinterface.cpp \
-        dialogs/surveysplashscreen.cpp \
         utilWindows/copyrightdialog.cpp \
         utilWindows/dialogabout.cpp \
         utilWindows/dialogpreferences.cpp \
         utilWindows/dialogfuturefeature.cpp \
         plots/systemplotsuper.cpp \
-        plots/systemplotqcp.cpp \
         plots/systemplotqwt.cpp \
         plots/resultplotsuper.cpp \
-        plots/resultplotqcp.cpp \
         plots/resultplotqwt.cpp \
         ../widgets/Common/FooterWidget.cpp \
         ../widgets/Common/HeaderWidget.cpp
@@ -112,27 +109,22 @@ SOURCES += main.cpp\
 HEADERS  += \
         mainWindow/mainwindow.h \
         includes/pilegrouptool_parameters.h \
-        qcp/qcustomplot.h \
         FEA/soilmat.h \
         FEA/pilefeamodeler.h \
         dialogs/materialdbinterface.h \
-        dialogs/surveysplashscreen.h \
         utilWindows/copyrightdialog.h \
         utilWindows/dialogabout.h \
         utilWindows/dialogpreferences.h \
         utilWindows/dialogfuturefeature.h \
         plots/systemplotsuper.h \
-        plots/systemplotqcp.h \
         plots/systemplotqwt.h \
         plots/resultplotsuper.h \
-        plots/resultplotqcp.h \
         plots/resultplotqwt.h \
         ../widgets/Common/FooterWidget.h \
         ../widgets/Common/HeaderWidget.h
 
 FORMS    += mainWindow/mainwindow.ui \
         dialogs/materialdbinterface.ui \
-        dialogs/surveysplashscreen.ui \
         utilWindows/copyrightdialog.ui \
         utilWindows/dialogabout.ui \
         utilWindows/dialogpreferences.ui \
